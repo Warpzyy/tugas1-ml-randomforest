@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulasi Random Forest · Prediksi Telat Kumpul Tugas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌳</text></svg>">
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--tx:#14231c;--mut:#62736b;--ln:#e3e9e6;--hd:#eef4f1;--ac:#1f7a52;--ac2:#2f9e6b;--or:#e08a2e;--sh:0 1px 2px rgba(20,35,28,.06),0 6px 20px rgba(20,35,28,.05)}
+[data-theme=dark]{--bg:#0e1612;--card:#16211b;--tx:#e8f0ec;--mut:#9bb0a5;--ln:#26362d;--hd:#1c2b23;--ac:#3dbb82;--sh:none}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 Inter,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx)}
+.w{max-width:1160px;margin:0 auto;padding:0 20px}
+header{background:var(--card);border-bottom:1px solid var(--ln)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-size:22px}
+h1{margin:0;font-size:19px;letter-spacing:-.2px}.sub{margin:0;color:var(--mut);font-size:13px}
+.steps{display:flex;gap:8px;padding-bottom:16px;flex-wrap:wrap}.st{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);background:var(--hd);padding:5px 12px 5px 6px;border-radius:99px}
+.st i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:20px;align-items:start;margin:24px auto}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:20px;box-shadow:var(--sh);margin-bottom:20px}.grid .card{margin:0 0 20px}
+h2{margin:0 0 4px;font-size:16px}h3{margin:16px 0 8px;font-size:14px}.mut{color:var(--mut);font-size:13px}
+.sc{overflow:auto;max-height:430px;border:1px solid var(--ln);border-radius:12px}.sc.f{max-height:none}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{position:sticky;top:0;background:var(--hd);text-align:left;font-weight:600;padding:9px 10px;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--ln)}tbody tr:nth-child(even){background:color-mix(in srgb,var(--hd) 45%,transparent)}
+td.n{color:var(--mut);width:36px}
+input{font:inherit;color:inherit;background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 6px;width:100%;min-width:70px}
+input:hover{border-color:var(--ln)}input:focus{outline:2px solid var(--ac2);background:var(--card)}
+th input{font-weight:600}input.cl{width:auto;min-width:64px;border-radius:99px;text-align:center;font-weight:600;font-size:12.5px}
+input.cl[data-k="0"]{background:#fcebd6;color:#9a5a10}input.cl[data-k="1"]{background:#dcf1e6;color:#17623f}
+[data-theme=dark] input.cl[data-k="0"]{background:#4a3416;color:#f3c58a}[data-theme=dark] input.cl[data-k="1"]{background:#17402e;color:#8fdcb4}
+.btn{font:inherit;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 14px;cursor:pointer}.btn:hover{background:var(--hd)}
+.btn.p{background:linear-gradient(135deg,var(--ac),var(--ac2));border:0;color:#fff;font-weight:600;width:100%;padding:12px;font-size:15px;margin-top:6px}.btn.p:disabled{opacity:.6;cursor:wait}
+.acts{display:flex;gap:8px;margin-top:12px}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+.tc{border:1px solid var(--ln);border-radius:12px;padding:10px 12px;margin-top:10px}.tc b{font-size:13px}.tc input{border-color:var(--ln)}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.err{background:#fdecea;color:#b3261e;border-radius:10px;padding:10px 14px;margin-top:10px;display:none;font-size:14px}
+.res{display:flex;gap:24px;align-items:center;flex-wrap:wrap}.big{font-size:34px;font-weight:800;color:var(--ac);line-height:1.1}
+.vote{flex:1;min-width:240px}.bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--hd);margin:6px 0}
+.chip{display:inline-block;padding:3px 12px;border-radius:99px;background:var(--hd);margin:2px 6px 2px 0;font-weight:600;font-size:13px}
+.seg{display:inline-flex;background:var(--hd);border-radius:12px;padding:4px;gap:4px;margin-bottom:12px}
+.seg button{border:0;background:transparent;color:var(--mut);padding:7px 16px;border-radius:9px;font:inherit;cursor:pointer}.seg button.on{background:var(--card);color:var(--tx);font-weight:600;box-shadow:var(--sh)}
+details{border:1px solid var(--ln);border-radius:12px;margin:10px 0;padding:0 14px}summary{cursor:pointer;padding:12px 0;font-weight:600}
+tr.best td{background:color-mix(in srgb,var(--ac2) 18%,transparent);font-weight:600}.ok{color:var(--ac);font-weight:700}
+.leg span{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 12px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:10px 0 36px}footer a{color:var(--ac)}
+</style></head><body>
+<header><div class="w"><div class="top"><div class="brand"><div class="logo">🌳</div><div><h1>Simulasi Random Forest</h1><p class="sub">Prediksi keterlambatan pengumpulan tugas mahasiswa</p></div></div>
+<button class="btn" id="th" onclick="theme()">🌙 Mode gelap</button></div>
+<div class="steps"><span class="st"><i>1</i>Dataset</span><span class="st"><i>2</i>Konfigurasi</span><span class="st"><i>3</i>Hasil &amp; perhitungan</span></div></div></header>
+<main class="w">
+<div class="grid"><section class="card"><h2>1. Dataset</h2><p class="mut">Klik sel untuk mengubah nilai. Warna kelas mengikuti nilainya.</p>
+<div class="sc"><table id="data"></table></div>
+<div class="acts"><button class="btn" onclick="addRow()">+ Tambah baris</button><button class="btn" onclick="delRow()">− Hapus baris</button></div>
+<h3>Data yang diprediksi (target)</h3><div class="sc f"><table id="tg"></table></div></section>
+<section class="card"><h2>2. Konfigurasi</h2><p class="mut">Kosongkan Row ID untuk bootstrap acak. Seed mengunci keacakan agar hasil dapat diulang.</p>
+<div id="cfg"></div><label>m — jumlah fitur kandidat per node</label><input id="m" type="number" value="2" min="1" style="border-color:var(--ln);width:90px">
+<button class="btn p" id="go" onclick="build()">Bangun Random Forest</button><div class="err" id="msg"></div></section></div>
+<div id="out"></div>
+<section class="card"><details style="border:0;padding:0"><summary style="padding:0">Rumus yang digunakan</summary>
+<p class="mut">Entropy(S) = Σ −pᵢ·log₂(pᵢ) · Gain(S,A) = Entropy(S) − Σ (|Sᵢ|/|S|)·Entropy(Sᵢ) · Split Info(S,A) = Σ −(|Sᵢ|/|S|)·log₂(|Sᵢ|/|S|) · Gain Ratio(S,A) = Gain(S,A) / Split Info(S,A). Prediksi akhir ditentukan melalui majority vote seluruh pohon.</p></details></section></main>
+<footer>[Nama] · [NIM] · Pembelajaran Mesin · <a href="#" target="_blank">GitHub</a></footer>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>(+n).toFixed(6).replace('.',','),cnt=c=>Object.entries(c).map(([k,v])=>k+': '+v).join(', ');
+const OR='#e08a2e',GR='#2f9e6b';
+let F=["Jam Tidur","Jumlah Tugas","Jenis Tugas","Motivasi"],TG=["Kurang","Sedikit","Kelompok","Tinggi"];
+let R=[["Kurang","Banyak","Individu","Rendah","Ya"],["Kurang","Banyak","Kelompok","Rendah","Ya"],["Cukup","Banyak","Individu","Tinggi","Tidak"],["Cukup","Sedang","Individu","Tinggi","Tidak"],["Cukup","Sedikit","Kelompok","Tinggi","Tidak"],["Kurang","Sedikit","Kelompok","Rendah","Ya"],["Cukup","Sedikit","Individu","Rendah","Tidak"],["Kurang","Sedang","Individu","Tinggi","Tidak"],["Kurang","Sedang","Kelompok","Rendah","Ya"],["Cukup","Sedang","Kelompok","Rendah","Ya"],["Kurang","Banyak","Kelompok","Tinggi","Ya"],["Cukup","Banyak","Kelompok","Rendah","Tidak"],["Kurang","Sedikit","Individu","Tinggi","Tidak"],["Cukup","Sedang","Individu","Rendah","Tidak"]];
+const T=[{ids:"4,10,9,3,6,10,8,11,10,2,10,1,14,8",seed:"103"},{ids:"4,5,2,12,7,8,3,2,2,1,7,9,5,13",seed:"2"},{ids:"2,10,12,13,11,9,4,5,12,5,5,12,2,11",seed:"4"}];
+function theme(){const d=document.documentElement,k=d.dataset.theme==='light';d.dataset.theme=k?'dark':'light';$('#th').textContent=k?'☀️ Mode terang':'🌙 Mode gelap'}
+function collect(){F=[...document.querySelectorAll('.hf')].map(i=>i.value);TG=[...document.querySelectorAll('.tgv')].map(i=>i.value);R=[...document.querySelectorAll('#data tr.r')].map(tr=>[...tr.querySelectorAll('input')].map(i=>i.value))}
+function tint(){const u=[...new Set([...document.querySelectorAll('input.cl')].map(i=>i.value))];document.querySelectorAll('input.cl').forEach(i=>i.dataset.k=u.indexOf(i.value))}
+function draw(){$('#data').innerHTML='<thead><tr><th>No</th>'+F.map(f=>`<th><input class="hf" value="${esc(f)}"></th>`).join('')+'<th>Telat Kumpul</th></tr></thead><tbody>'+R.map((r,i)=>`<tr class="r"><td class="n">${i+1}</td>`+r.map((v,j)=>`<td><input${j===r.length-1?' class="cl"':''} value="${esc(v)}"></td>`).join('')+'</tr>').join('')+'</tbody>';
+$('#tg').innerHTML='<tr>'+F.map(f=>`<th>${esc(f)}</th>`).join('')+'</tr><tr>'+TG.map(v=>`<td><input class="tgv" value="${esc(v)}"></td>`).join('')+'</tr>';
+$('#cfg').innerHTML=T.map((t,i)=>`<div class="tc"><b>Pohon ${i+1}</b><div class="two"><div><label>Row ID bootstrap (opsional)</label><input class="ti" value="${t.ids}"></div><div><label>Seed</label><input class="ts" value="${t.seed}"></div></div></div>`).join('');tint()}
+document.addEventListener('input',e=>{if(e.target.classList.contains('cl'))tint()});
+function addRow(){collect();R.push(Array(F.length+1).fill(''));draw()}
+function delRow(){collect();if(R.length>2)R.pop();draw()}
+async function build(){collect();const e=$('#msg'),b=$('#go');e.style.display='none';b.disabled=true;b.textContent='Menghitung…';
+try{const trees=[...document.querySelectorAll('.tc')].map(c=>({ids:c.querySelector('.ti').value,seed:c.querySelector('.ts').value}));
+const r=await fetch('/api/forest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({features:F,rows:R,target:TG,m:$('#m').value,trees})});
+const d=await r.json();if(d.error)throw new Error(d.error);show(d);$('#out').scrollIntoView({behavior:'smooth'})}
+catch(x){e.textContent='Terjadi kesalahan: '+x.message;e.style.display='block'}b.disabled=false;b.textContent='Bangun Random Forest'}
+function layout(n,d,s){n.d=d;if(n.leaf!==undefined){n.x=s.i++;return}const ks=Object.keys(n.children);ks.forEach(k=>layout(n.children[k],d+1,s));n.x=(n.children[ks[0]].x+n.children[ks[ks.length-1]].x)/2}
+function depth(n){return n.children?1+Math.max(...Object.values(n.children).map(depth)):0}
+function svg(tree,cls){const t=JSON.parse(JSON.stringify(tree)),s={i:0};layout(t,0,s);let n=t;while(n.children){n.hit=TG[n.fi];n=n.children[n.hit];if(!n)break}
+const W=Math.max(s.i*140,320),H=(depth(t)+1)*110,X=n=>n.x*140+70,Y=n=>n.d*110+40;let l='',o='';
+(function w(n){if(!n.children)return;for(const[k,c]of Object.entries(n.children)){const on=n.hit===k;l+=`<line x1="${X(n)}" y1="${Y(n)+20}" x2="${X(c)}" y2="${Y(c)-20}" stroke="${on?OR:'#9fd3b8'}" stroke-width="${on?4:2}"/><text x="${(X(n)+X(c))/2+6}" y="${(Y(n)+Y(c))/2}" font-size="12" fill="currentColor">${esc(k)}</text>`;w(c)}
+o+=`<ellipse cx="${X(n)}" cy="${Y(n)}" rx="58" ry="22" fill="${GR}"/><text x="${X(n)}" y="${Y(n)+4}" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">${esc(n.feat)}</text>`})(t);
+(function w(n){if(n.children){Object.values(n.children).forEach(w);return}const c=cls.indexOf(n.leaf)?GR:OR;o+=`<rect x="${X(n)-40}" y="${Y(n)-18}" width="80" height="36" rx="9" fill="${c}"/><text x="${X(n)}" y="${Y(n)+5}" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">${esc(n.leaf)}</text>`})(t);
+return `<div class="sc f" style="border:0"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${l}${o}</svg></div>`}
+function show(d){const cls=[...new Set(R.map(r=>r[r.length-1]))],tot=d.trees.length;
+$('#out').innerHTML=`<section class="card"><h2>3. Hasil Majority Vote</h2><p class="mut">Data target: ${F.map((f,i)=>esc(f)+' = <b>'+esc(TG[i])+'</b>').join(' · ')}</p>
+<div class="res"><div><div class="mut">Prediksi akhir</div><div class="big">${esc(d.final)}</div></div><div class="vote"><div class="mut">Suara: ${esc(cnt(d.votes))}</div>
+<div class="bar">${cls.map((c,i)=>`<div style="width:${(d.votes[c]||0)/tot*100}%;background:${i?GR:OR}"></div>`).join('')}</div>${d.trees.map((t,i)=>`<span class="chip">Pohon ${i+1}: ${esc(t.pred)}</span>`).join('')}</div></div></section>
+<section class="card"><div class="seg">${d.trees.map((t,i)=>`<button class="tb" onclick="tab(${i})">Pohon ${i+1}</button>`).join('')}</div>${d.trees.map(t=>`<div class="tp" style="display:none">${pane(t,cls)}</div>`).join('')}</section>`;tab(0)}
+function tab(i){document.querySelectorAll('.tp').forEach((p,j)=>p.style.display=i===j?'block':'none');document.querySelectorAll('.tb').forEach((b,j)=>b.className='tb'+(i===j?' on':''))}
+function pane(t,cls){let h=`<h3>Bootstrap sample · ${esc(cnt(t.counts))}</h3><div class="sc"><table><thead><tr><th>No</th>${F.map(f=>`<th>${esc(f)}</th>`).join('')}<th>Kelas</th></tr></thead><tbody>${t.sample.map(r=>`<tr><td class="n">${r.id}</td>${r.x.map(v=>`<td>${esc(v)}</td>`).join('')}<td>${esc(r.y)}</td></tr>`).join('')}</tbody></table></div><p class="mut">Out-of-bag: ${t.oob.join(', ')||'-'}</p>
+<h3>Pohon keputusan</h3><p class="mut leg">Jalur prediksi ditandai garis oranye tebal<span style="background:${GR}"></span>${esc(cls[1]||'')}<span style="background:${OR}"></span>${esc(cls[0]||'')}</p>${svg(t.tree,cls)}<h3>Perhitungan langkah demi langkah</h3>`;
+t.steps.forEach((s,k)=>{h+=`<details${k?'':' open'}><summary>Node: ${esc(s.name)} · n = ${s.n} (${esc(cnt(s.counts))}) · Entropy ${fmt(s.entropy)}</summary>`;
+s.cands.forEach(c=>{h+=`<h3>${esc(c.feat)} ${c.feat===s.chosen?'<span class="ok">✓ terpilih</span>':''}</h3><div class="sc f"><table><thead><tr><th>Nilai</th><th>Jumlah</th><th>Distribusi</th><th>Entropy</th><th>Split term</th></tr></thead><tbody>${c.groups.map(g=>`<tr><td>${esc(g.v)}</td><td>${g.n}</td><td>${esc(cnt(g.counts))}</td><td>${fmt(g.ent)}</td><td>${fmt(g.term)}</td></tr>`).join('')}<tr class="${c.feat===s.chosen?'best':''}"><td colspan="5">Gain = ${fmt(c.gain)} · Split Info = ${fmt(c.split)} · Gain Ratio = ${fmt(c.gr)}</td></tr></tbody></table></div>`});h+='</details>'});
+return h+`<p>Jalur prediksi: <b>${esc(t.path.join(' → ')||'-')}</b> → <span class="ok">${esc(t.pred)}</span></p>`}
+draw();
+</script></body></html>
